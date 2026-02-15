@@ -1,0 +1,28 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "sync": "node -e \"require('dotenv').config(); const s=require('./src/tasks/sync-hitokoto'); s().then(()=>process.exit(0))\"",
+    "init-db": "mysql -u root -p < init.sql",
+    "pages:dev": "npx wrangler pages dev public --compatibility-flags=nodejs_compat",
+    "pages:deploy": "npx wrangler pages deploy public"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@hono/node-server": "^1.19.9",
+    "dotenv": "^17.3.1",
+    "hono": "^4.11.8",
+    "mysql2": "^3.17.1",
+    "node-cron": "^4.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}

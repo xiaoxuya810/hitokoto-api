@@ -1,14 +1,23 @@
 const pool = require('../config/db');
 
-const CDN_BASE =
-  'https://cdn.jsdelivr.net/gh/hitokoto-osc/sentences-bundle@latest/sentences/';
+const CDN_SOURCES = [
+  'https://cdn.jsdmirror.com/gh/hitokoto-osc/sentences-bundle@latest/sentences/',
+  'https://cdn.jsdelivr.net/gh/hitokoto-osc/sentences-bundle@latest/sentences/',
+];
 const CATEGORIES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l'];
 
 async function fetchCategory(category) {
-  const url = `${CDN_BASE}${category}.json`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`获取 ${url} 失败: ${res.status}`);
-  return res.json();
+  for (const base of CDN_SOURCES) {
+    try {
+      const url = `${base}${category}.json`;
+      const res = await fetch(url, { signal: AbortSignal.timeout(10000) });
+      if (!res.ok) continue;
+      return await res.json();
+    } catch {
+      continue;
+    }
+  }
+  throw new Error('所有源均不可用');
 }
 
 async function sync() {

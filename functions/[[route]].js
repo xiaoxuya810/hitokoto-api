@@ -47,4 +47,27 @@ app.get('/yiyi', async (c) => {
 
 app.get('/health', (c) => c.json({ status: 'ok' }));
 
+// 广告接口
+const ADS_SQL = `
+  SELECT ad_id, title, description, icon_url, landing_page, ad_type, style, expires_at
+  FROM ads
+  WHERE is_active = 1
+    AND (starts_at IS NULL OR starts_at <= NOW())
+    AND (expires_at IS NULL OR expires_at > NOW())
+  ORDER BY created_at DESC
+`;
+
+app.get('/api/v1/ads/active', async (c) => {
+  const db = getPool(c.env);
+  try {
+    const [rows] = await db.query(ADS_SQL);
+    for (const ad of rows) {
+      if (typeof ad.style === 'string') ad.style = JSON.parse(ad.style);
+    }
+    return c.json({ code: 200, data: rows });
+  } catch (err) {
+    return c.json({ code: 500, msg: '服务器内部错误' }, 500);
+  }
+});
+
 export const onRequest = handle(app);
